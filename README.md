@@ -1,4 +1,4 @@
-# Discord Bot Scripts
+# Discord Boost Bot
 
 This repository contains scripts for automating various tasks on Discord, including joining guilds, boosting servers, and more.
 
