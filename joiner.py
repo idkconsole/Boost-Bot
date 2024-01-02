@@ -1,6 +1,8 @@
 import tls_client, threading, os, requests
 from base64 import b64encode
 import json, time
+import subprocess
+import datetime
 
 __useragent__ = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"
 build_number = 165486
@@ -40,14 +42,13 @@ def get_headers(token):
   return headers
 
 os.system("cls" if os.name == "nt" else "clear")
-tkn = ""
-secret = ""
-client_id =""
-redirect = "http://localhost:8080" #dont change this
+tkn = "MTE3OTI1MDAxODk0Nzk2MDk0Mw.GBgGYA.8B_OldWxOwZQ7RDksbA5WttgqagDucTkoqZPTo"
+secret = "Us_BGJNWML_zi-wvk6MJNmMCoJV_REbW"
+client_id ="1179250018947960943"
+redirect = "http://localhost:8080"
 API_ENDPOINT = 'https://canary.discord.com/api/v9'
 auth = f"https://canary.discord.com/api/oauth2/authorize?client_id={client_id}&redirect_uri={redirect}&response_type=code&scope=identify%20guilds.join"
 guild = input("[!] Guild ID: ")
-nickname = input("[!] Nickname: ")
 
 def exchange_code(code):
   data = {
@@ -59,7 +60,6 @@ def exchange_code(code):
   }
   headers = {'Content-Type': 'application/x-www-form-urlencoded'}
   r = requests.post(str(API_ENDPOINT) + '/oauth2/token', data=data, headers=headers)
-  print(r.text)
   if r.status_code in (200, 201, 204):
     return r.json()
   else:
@@ -79,34 +79,19 @@ def add_to_guild(access_token, userID):
   r = requests.put(url=url, headers=headers, json=data)
   return r.status_code
 
-def rename(tk):
-    headers = get_headers(tk)
-    client = tls_client.Session(client_identifier="firefox_102")
-    client.headers.update(headers)
-    r = client.patch(f"https://canary.discord.com/api/v9/guilds/{guild}/members/@me", json={"nick": nickname})
-    if r.status_code in (200, 201, 204):
-        print("[+] Nickname Changed to %s" % (nickname))
-        return "ok"
-    else:
-        print("[-] Failed to Change Nickname")
-        return "error"
-
 def authorizer(tk):
     headers = get_headers(tk)
     r = requests.post(auth, headers=headers, json={"authorize": "true"})
-    print(r.text)
     if r.status_code in (200, 201, 204):
         location = r.json()['location']
         code = location.replace("http://localhost:8080?code=", "")
         exchange = exchange_code(code)
-        print("[+] Authorized Token")
+        time = datetime.datetime.now().strftime("%H:%M:%S")
+        print(f"{time} | Successfully Authorized Token")
         access_token = exchange['access_token']
         userid = get_user(access_token)
         add_to_guild(access_token, userid)
-        print("[+] Added to Guild %s" % (guild))
-        if not nickname == "":
-          threading.Thread(target=rename, args=(tk,)).start()
-        return "ok"
+        print(f"{time} | Successfully Joined -> %s" % (guild))
 
 def get_user(access: str):
   endp = "https://canary.discord.com/api/v9/users/@me"
@@ -114,23 +99,33 @@ def get_user(access: str):
   rjson = r.json()
   return rjson['id']
 
-def main(tk):
-    authorizer(tk)
-    headers = get_headers(tk)
-    client = tls_client.Session(client_identifier="firefox_102")
-    client.headers.update(headers)
-    r = client.get(f"https://canary.discord.com/api/v9/users/@me/guilds/premium/subscription-slots")
-    idk = r.json()
-    for x in idk:
-        id_ = x['id']
-        payload = {"user_premium_guild_subscription_slot_ids": [id_]}
-        r = client.put(f"https://canary.discord.com/api/v9/guilds/{guild}/premium/subscriptions", json=payload)
-        if r.status_code in (200, 201, 204):
-            print("[+] Boosted %s" % (guild))
+with open("tokens.txt", "r") as file:
+    lines = file.readlines()
+    token_components = [line.strip().split(':') for line in lines if len(line.strip().split(':')) == 3]
 
-f = open("tokens.txt", "r").readlines()
-os.system("cls" if os.name == "nt" else "clear")
-for tk in f:
-    tk = tk.strip()
-    tk = tk.split(":")[2]
-    threading.Thread(target=main, args=(tk,)).start()
+if len(token_components) < 7:
+    print("Not enough valid tokens. Need at least 7.")
+    exit()
+
+tokens_to_use = [comp[2] for comp in token_components[:7]]
+remaining_tokens = token_components[7:]
+
+threads = []
+for tk in tokens_to_use:
+    thread = threading.Thread(target=authorizer, args=(tk,))
+    thread.start()
+    threads.append(thread)
+
+for thread in threads:
+    thread.join()
+
+tokens_string = ','.join(tokens_to_use)
+subprocess.run(["python", "boost.py", guild, tokens_string])
+
+with open("tokens.txt", "w") as file:
+    for token_parts in remaining_tokens:
+        file.write(f"{':'.join(token_parts)}\n")
+
+with open("used.txt", "a") as file:
+    for tk in tokens_to_use:
+        file.write(f"{tkn}\n")
