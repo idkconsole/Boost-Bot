@@ -110,3 +110,6 @@ for tk in tokens_to_use:
     threads.append(thread)
 for thread in threads:
     thread.join()
+
+tokens_string = ','.join(tokens_to_use)
+subprocess.run(["python", "boost.py", guild, tokens_string])
