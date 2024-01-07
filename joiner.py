@@ -42,9 +42,9 @@ def get_headers(token):
   return headers
 
 os.system("cls" if os.name == "nt" else "clear")
-tkn = "MTE3OTI1MDAxODk0Nzk2MDk0Mw.GBgGYA.8B_OldWxOwZQ7RDksbA5WttgqagDucTkoqZPTo"
-secret = "Us_BGJNWML_zi-wvk6MJNmMCoJV_REbW"
-client_id ="1179250018947960943"
+tkn = "MTE5MzYxMzU1MTI1NzAwMjAxNQ.GcRUh0.qG6V0ZB_smmHpNot9fNnnJ5T9gN1yoWF8g8_Lk"
+secret = "6CHkwv2rBi5az4vMhGnG5mmcYblyvUs8"
+client_id ="1193613551257002015"
 redirect = "http://localhost:8080"
 API_ENDPOINT = 'https://canary.discord.com/api/v9'
 auth = f"https://canary.discord.com/api/oauth2/authorize?client_id={client_id}&redirect_uri={redirect}&response_type=code&scope=identify%20guilds.join"
