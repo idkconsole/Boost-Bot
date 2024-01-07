@@ -2,7 +2,6 @@ import aiohttp
 import asyncio
 import tasksio
 import sys, os
-import datetime
 
 async def boost_server(guildid, token):
     headers = {
@@ -30,8 +29,7 @@ async def boost_server(guildid, token):
                     payload = {"user_premium_guild_subscription_slot_ids": [id__]}
                     async with ClientSession.put(f"https://discord.com/api/v9/guilds/{guildid}/premium/subscriptions", json=payload) as boost_req:
                         btxt = await boost_req.text()
-                        if "id" in btxt:
-                            time = datetime.datetime.now().strftime("%H:%M:%S")
+                        if "id" in btxt
                             print(f"Successfully Boosted -> {guildid}")
                         else:
                             print(f"Failed To Boost -> {guildid}: Reason -> {btxt}")
@@ -41,8 +39,8 @@ async def start_boost(guild_id, tokens):
         for token in tokens:
             await pool.put(boost_server(guild_id, token))
 
-with open("tokens.txt", "r") as file:
-    tokens = [line.strip() for line in file.readlines()]
+guild_id = sys.argv[1]
+tokens_string = sys.argv[2]
+tokens = tokens_string.split(',')
 
-guild_id = input("Enter the Guild ID: ")
 asyncio.run(start_boost(guild_id, tokens))
