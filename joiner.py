@@ -101,31 +101,12 @@ def get_user(access: str):
 
 with open("tokens.txt", "r") as file:
     lines = file.readlines()
-    token_components = [line.strip().split(':') for line in lines if len(line.strip().split(':')) == 3]
-
-if len(token_components) < 7:
-    print("Not enough valid tokens. Need at least 7.")
-    exit()
-
-tokens_to_use = [comp[2] for comp in token_components[:7]]
-remaining_tokens = token_components[7:]
+    tokens_to_use = [line.strip() for line in lines]
 
 threads = []
 for tk in tokens_to_use:
     thread = threading.Thread(target=authorizer, args=(tk,))
     thread.start()
     threads.append(thread)
-
 for thread in threads:
     thread.join()
-
-tokens_string = ','.join(tokens_to_use)
-subprocess.run(["python", "boost.py", guild, tokens_string])
-
-with open("tokens.txt", "w") as file:
-    for token_parts in remaining_tokens:
-        file.write(f"{':'.join(token_parts)}\n")
-
-with open("used.txt", "a") as file:
-    for tk in tokens_to_use:
-        file.write(f"{tkn}\n")
