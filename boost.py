@@ -29,7 +29,7 @@ async def boost_server(guildid, token):
                     payload = {"user_premium_guild_subscription_slot_ids": [id__]}
                     async with ClientSession.put(f"https://discord.com/api/v9/guilds/{guildid}/premium/subscriptions", json=payload) as boost_req:
                         btxt = await boost_req.text()
-                        if "id" in btxt
+                        if "id" in btxt:
                             print(f"Successfully Boosted -> {guildid}")
                         else:
                             print(f"Failed To Boost -> {guildid}: Reason -> {btxt}")
