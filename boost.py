@@ -32,17 +32,17 @@ async def boost_server(guildid, token):
                         btxt = await boost_req.text()
                         if "id" in btxt:
                             time = datetime.datetime.now().strftime("%H:%M:%S")
-                            print(f"{time} | Successfully Boosted -> {guildid}")
+                            print(f"Successfully Boosted -> {guildid}")
                         else:
-                            print(f"{time} | Failed To Boost -> {guildid}: Reason -> {btxt}")
+                            print(f"Failed To Boost -> {guildid}: Reason -> {btxt}")
 
 async def start_boost(guild_id, tokens):
     async with tasksio.TaskPool(10_000) as pool:
         for token in tokens:
             await pool.put(boost_server(guild_id, token))
 
-guild_id = sys.argv[1]
-tokens_string = sys.argv[2]
-tokens = tokens_string.split(',')
+with open("tokens.txt", "r") as file:
+    tokens = [line.strip() for line in file.readlines()]
 
+guild_id = input("Enter the Guild ID: ")
 asyncio.run(start_boost(guild_id, tokens))
