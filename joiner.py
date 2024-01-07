@@ -42,7 +42,7 @@ def get_headers(token):
   return headers
 
 os.system("cls" if os.name == "nt" else "clear")
-tkn = "MTE5MzYxMzU1MTI1NzAwMjAxNQ.GcRUh0.qG6V0ZB_smmHpNot9fNnnJ5T9gN1yoWF8g8_Lk"
+tkn = "MTE5MzYxMzU1MTI1NzAwMjAxNQ.GqWdo3.8n6VGzlTC6r21dAOJCkcyVEp4_jijR220cwa84"
 secret = "6CHkwv2rBi5az4vMhGnG5mmcYblyvUs8"
 client_id ="1193613551257002015"
 redirect = "http://localhost:8080"
